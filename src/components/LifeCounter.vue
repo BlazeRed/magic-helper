@@ -130,19 +130,19 @@ const deltaClass = computed(() => {
 })
 
 onMounted(() => {
-  const mainCard = document.querySelector(`#player-${props.player.id}`)
+  const mainCard: HTMLElement | null = document.querySelector(`#player-${props.player.id}`)
 
   if (!mainCard) return
 
   const height = mainCard.offsetHeight
   const width = mainCard.offsetWidth
 
-  mainCard.style['transform-origin'] = 'center';
+  mainCard.style.transformOrigin = 'center';
 
   if (props.rotation === 90 || props.rotation === -90) {
     mainCard.style.height = `${width}px`
     mainCard.style.width = `${height}px`
-    mainCard.style['transform-origin'] = 'top left';
+    mainCard.style.transformOrigin = 'top left';
   }
 
   mainCard.style.transform = `rotate(${props.rotation}deg)`
