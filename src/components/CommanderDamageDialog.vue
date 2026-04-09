@@ -136,8 +136,6 @@ const dialogRotation = computed(() => {
 
 const playerColor = computed(() => settingsStore.getPlayerColor(props.player.id))
 
-const playerColorDim = computed(() => hexToRgba(playerColor.value, 0.12))
-
 function opponentColorDim(id: number): string {
   return hexToRgba(settingsStore.getPlayerColor(id), 0.08)
 }
