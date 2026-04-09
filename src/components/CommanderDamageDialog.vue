@@ -2,18 +2,12 @@
   <v-dialog v-model="open" max-width="540" :scrim="true">
     <v-card class="cmd-dialog" rounded="xl">
 
-      <!-- Title with editable player name -->
+      <!-- Title -->
       <v-card-title class="d-flex align-center justify-space-between pa-4 pb-2">
         <div class="d-flex align-center gap-2">
-          <div
-            class="title-chip"
-            :style="{ background: playerColor }"
-          />
+          <div class="title-chip" :style="{ background: playerColor }" />
           <v-icon size="18" class="mr-1">mdi-sword-cross</v-icon>
-          <PlayerNameEdit
-            :model-value="player.name"
-            @update:model-value="gameStore.setPlayerName(player.id, $event)"
-          />
+          <span class="text-body-1 text-medium-emphasis">Commander Damage</span>
         </div>
         <v-btn icon size="small" variant="text" @click="open = false">
           <v-icon>mdi-close</v-icon>
@@ -23,7 +17,7 @@
       <v-divider />
 
       <v-card-text class="pa-4">
-        <div class="section-label mb-3">Commander Damage</div>
+        <div class="section-label mb-3">Damage Received</div>
 
         <!-- Positional player grid -->
         <div
@@ -46,15 +40,30 @@
               class="player-card player-card--self"
               :style="{
                 borderColor: playerColor,
-                background: `${playerColorDim}`,
+                background: playerColorDim,
               }"
             >
-              <div
-                class="card-color-strip"
-                :style="{ background: playerColor }"
-              />
-              <span class="card-name self-name">{{ player.name }}</span>
-              <span class="self-life">{{ player.life }} ♥</span>
+              <div class="card-color-strip" :style="{ background: playerColor }" />
+              <!-- Editable name -->
+              <div class="self-name-row">
+                <PlayerNameEdit
+                  :model-value="player.name"
+                  @update:model-value="gameStore.setPlayerName(player.id, $event)"
+                />
+                <v-icon size="12" class="edit-hint">mdi-pencil</v-icon>
+              </div>
+              <!-- Editable life total -->
+              <div class="damage-counter">
+                <button
+                  class="dmg-btn"
+                  @click="gameStore.adjustLife(player.id, -1)"
+                >−</button>
+                <span class="dmg-value life-value">{{ player.life }} <span class="life-label">♥</span></span>
+                <button
+                  class="dmg-btn"
+                  @click="gameStore.adjustLife(player.id, +1)"
+                >+</button>
+              </div>
             </div>
 
             <!-- Opponent cell -->
@@ -234,15 +243,25 @@ function opponentName(id: number): string {
   opacity: 1;
 }
 
-.self-name {
+.self-name-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.edit-hint {
+  opacity: 0.4;
+  flex-shrink: 0;
+}
+
+.life-value {
   color: #fff;
 }
 
-.self-life {
-  font-size: 1rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.7);
-  margin-top: auto;
+.life-label {
+  font-size: 0.75rem;
+  opacity: 0.7;
 }
 
 /* Damage counter */
