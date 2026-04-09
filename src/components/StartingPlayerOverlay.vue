@@ -105,7 +105,7 @@
             </g>
           </svg>
 
-          <p class="spo-text">Selecting starting player…</p>
+          <p class="spo-text">Choosing starting player…</p>
         </div>
       </div>
     </Transition>
@@ -164,7 +164,7 @@ defineProps<{ visible: boolean }>()
 }
 
 .spo-text {
-  font-family: 'Cinzel', serif;
+  font-family: 'Cinzel Decorative', serif;
   font-size: 1rem;
   font-weight: 600;
   color: #fff;
