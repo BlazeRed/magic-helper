@@ -1,1 +1,24 @@
-{"name":"magic-helper","private":true,"version":"0.0.0","type":"module","scripts":{"dev":"vite","build":"vue-tsc -b && vite build","preview":"vite preview"},"dependencies":{"@mdi/font":"^7.4.47","pinia":"^2.3.1","vue":"^3.5.13","vuetify":"^3.8.4"},"devDependencies":{"@vitejs/plugin-vue":"^5.2.3","typescript":"~5.7.2","vite":"^6.3.1","vite-plugin-vuetify":"^2.1.1","vue-tsc":"^2.2.10"}}
+{
+  "name": "HelM",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "pinia": "^2.3.1",
+    "vue": "^3.5.13",
+    "vuetify": "^3.8.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.3",
+    "typescript": "~5.7.2",
+    "vite": "^6.3.1",
+    "vite-plugin-vuetify": "^2.1.1",
+    "vue-tsc": "^2.2.10"
+  }
+}
