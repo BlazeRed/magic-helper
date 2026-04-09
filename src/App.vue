@@ -13,13 +13,15 @@
             />
           </div>
         </template>
-
+        
+        <div style="grid-area: brand;">
+          <div class="brand-mark">
+            <span class="brand-title">HelM</span>
+            <span class="brand-tagline">Life Tracker</span>
+          </div>
+        </div>
         <!-- ─── Center controls ─── -->
         <div class="controls-cell" style="grid-area: controls">
-          <div class="brand-mark">
-            <span class="brand-title">Helma</span>
-          </div>
-
           <div class="controls-buttons">
             <v-btn
               icon
@@ -43,16 +45,14 @@
               <v-tooltip activator="parent" location="bottom">Reset Game</v-tooltip>
             </v-btn>
           </div>
-
-          <span class="brand-tagline">Commander Life Tracker</span>
         </div>
       </div>
 
       <!-- ─── First launch splash ─── -->
       <div v-else class="splash-screen">
         <div class="splash-content">
-          <h1 class="splash-brand mb-1">Helma</h1>
-          <p class="splash-tagline mb-6">Commander Life Tracker</p>
+          <h1 class="splash-brand mb-1">HelM</h1>
+          <p class="splash-tagline mb-6">Life Tracker</p>
           <v-btn color="primary" size="large" @click="settingsDialogOpen = true">
             <v-icon start>mdi-play</v-icon>
             New Game
@@ -165,7 +165,7 @@ const layoutSlots = computed<LayoutSlot[]>(() => {
       { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
       { area: 'p3', type: 'player', playerIndex: 2, rotation: 180 },
       { area: 'p4', type: 'player', playerIndex: 3, rotation: 180 },
-      { area: 'p5', type: 'player', playerIndex: 4, rotation: 90 },
+      { area: 'p5', type: 'player', playerIndex: 4, rotation: -90 },
       { area: 'controls', type: 'controls' },
     ],
     6: [
@@ -280,11 +280,11 @@ html, body, #app {
 /* 2 players */
 .grid-2p {
   grid-template-rows: 1fr min-content 1fr;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-template-areas:
-    "p1"
-    "controls"
-    "p2";
+    "p1 p1 p1"
+    "brand controls ."
+    "p2 p2 p2";
 }
 
 /* 3 players */
@@ -292,19 +292,19 @@ html, body, #app {
   grid-template-rows: 1fr min-content 1fr;
   grid-template-columns: 1fr min-content 1fr;
   grid-template-areas:
-    "p1    .          p3"
-    ".     controls   p3"
-    "p2    .          p3";
+    "p1        p1         p3"
+    "brand     controls   p3"
+    "p2        p2         p3";
 }
 
 /* 4 players */
 .grid-4p {
   grid-template-rows: 1fr min-content 1fr;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-areas:
-    "p3       p4"
-    "controls controls"
-    "p1       p2";
+    "p3       p3 p4           p4"
+    "brand    controls controls   . "
+    "p1       p1 p2          p2";
 }
 
 /* 5 players */
@@ -312,9 +312,9 @@ html, body, #app {
   grid-template-rows: 1fr min-content 1fr;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-areas:
-    "p5   p3       p4"
-    "p5  controls  ."
-    "p5   p1       p2";
+    "p3       p4           p5"
+    "brand     controls    p5"
+    "p1       p2           p5";
 }
 
 /* 6 players */
@@ -323,7 +323,7 @@ html, body, #app {
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-areas:
     "p4     p5         p6"
-    ".      controls   ."
+    "brand      controls   ."
     "p1     p2         p3";
 }
 
@@ -341,39 +341,40 @@ html, body, #app {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px;
+  padding: 6px;
 }
 
 .brand-mark {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 5px;
   white-space: nowrap;
 }
 
 .brand-title {
   font-family: 'Cinzel Decorative', 'Cinzel', serif;
-  font-size: clamp(0.55rem, 1.4vw, 0.85rem);
+  font-size: 1.9em;
   font-weight: 700;
   color: rgb(var(--v-theme-primary));
-  letter-spacing: 0.04em;
-}
-
-.controls-buttons {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  letter-spacing: 0.05em;
+  line-height: 1.1em;
 }
 
 .brand-tagline {
   font-family: 'Cinzel', serif;
-  font-size: clamp(0.4rem, 0.9vw, 0.6rem);
-  color: rgba(255, 255, 255, 0.35);
-  letter-spacing: 0.12em;
+  font-size: 0.76em;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
 }
+
+.controls-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+}
+
 
 /* Splash screen */
 .splash-screen {

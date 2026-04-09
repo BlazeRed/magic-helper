@@ -62,11 +62,11 @@ export function getGridConfig(numPlayers: number): GridConfig {
     },
     5: {
       template: {
-        1: '"p5 p3 p4" "p5 p1 p2"',
-        2: '"p5 p3 p4" "p5 p1 p2"',
-        3: '"p2 p1 p5" "p4 p3 p5"',
-        4: '"p2 p1 p5" "p4 p3 p5"',
-        5: '"p4 p4 p2 p2" "p3 p3 p1 p1" "p5 p5 p5 p5"',
+        1: '"p3 p4 p5" "p1 p2 p5"',
+        2: '"p3 p4 p5" "p1 p2 p5"',
+        3: '"p5 p2 p1" "p5 p4 p3"',
+        4: '"p5 p2 p1" "p5 p4 p3"',
+        5: '"p1 p1 p3 p3" "p2 p2 p4 p4" "p5 p5 p5 p5"',
       },
       cols: '1fr min(min-content, 1fr) 1fr',
       rows: '1fr 1fr min(min-content, 1fr)',
@@ -75,7 +75,7 @@ export function getGridConfig(numPlayers: number): GridConfig {
         { id: 2, area: 'p2', rotation: 0 },
         { id: 3, area: 'p3', rotation: 180 },
         { id: 4, area: 'p4', rotation: 180 },
-        { id: 5, area: 'p5', rotation: 90 },
+        { id: 5, area: 'p5', rotation: -90 },
       ],
     },
     6: {

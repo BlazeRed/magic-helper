@@ -80,16 +80,6 @@
           :all-players="gameStore.players"
           @open="cmdDialogOpen = true"
         />
-        <v-btn
-          icon
-          size="x-small"
-          variant="text"
-          density="compact"
-          title="Commander damage"
-          @click.stop="cmdDialogOpen = true"
-        >
-          <v-icon size="16">mdi-sword-cross</v-icon>
-        </v-btn>
       </div>
     </v-card>
 
