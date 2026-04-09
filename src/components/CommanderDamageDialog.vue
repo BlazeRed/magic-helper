@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="open" max-width="540" :scrim="true">
-    <v-card class="cmd-dialog" rounded="xl">
+    <v-card class="cmd-dialog" rounded="xl" :style="`transform: rotate(${dialogRotation})`">
 
       <!-- Title -->
       <v-card-title class="d-flex align-center justify-space-between pa-4 pb-2">
@@ -160,6 +160,13 @@ const gameStore = useGameStore()
 const settingsStore = useSettingsStore()
 
 const gridConfig = computed(() => getGridConfig(gameStore.numPlayers))
+
+const dialogRotation = computed(() => {
+  const config = gridConfig.value
+  const slot = config.slots.find(s => s.id === props.player.id)
+  console.log('Slot for player', props.player.id, slot)
+  return `${slot?.rotation ?? 0}deg`
+})
 
 const playerColor = computed(() => settingsStore.getPlayerColor(props.player.id))
 
