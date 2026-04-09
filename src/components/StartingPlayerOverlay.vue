@@ -22,25 +22,6 @@
                   <feMergeNode in="SourceGraphic"/>
                 </feMerge>
               </filter>
-              <style>
-                #card-shuffle-anim .csa-cg {
-                  transform-box: fill-box;
-                  transform-origin: center bottom;
-                  animation: shuffle-fan 2.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-                }
-                #card-shuffle-anim .csa-c1 { --sf-a: -27deg; animation-delay: -0.30s; }
-                #card-shuffle-anim .csa-c2 { --sf-a: -18deg; animation-delay: -0.25s; }
-                #card-shuffle-anim .csa-c3 { --sf-a:  -9deg; animation-delay: -0.20s; }
-                #card-shuffle-anim .csa-c4 { --sf-a:   0deg; animation-delay: -0.15s; }
-                #card-shuffle-anim .csa-c5 { --sf-a:   9deg; animation-delay: -0.10s; }
-                #card-shuffle-anim .csa-c6 { --sf-a:  18deg; animation-delay: -0.05s; }
-                #card-shuffle-anim .csa-c7 { --sf-a:  27deg; animation-delay:  0.00s; }
-                @keyframes shuffle-fan {
-                  0%, 10%   { transform: rotate(0deg)        translateY(0px); }
-                  38%, 62%  { transform: rotate(var(--sf-a)) translateY(-5px); }
-                  90%, 100% { transform: rotate(0deg)        translateY(0px); }
-                }
-              </style>
             </defs>
 
             <!--
@@ -134,6 +115,27 @@
 <script setup lang="ts">
 defineProps<{ visible: boolean }>()
 </script>
+
+/* SVG card animation — non-scoped so rules reach inside the inline SVG */
+<style>
+#card-shuffle-anim .csa-cg {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: shuffle-fan 2.8s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+#card-shuffle-anim .csa-c1 { --sf-a: -27deg; animation-delay: -0.30s; }
+#card-shuffle-anim .csa-c2 { --sf-a: -18deg; animation-delay: -0.25s; }
+#card-shuffle-anim .csa-c3 { --sf-a:  -9deg; animation-delay: -0.20s; }
+#card-shuffle-anim .csa-c4 { --sf-a:   0deg; animation-delay: -0.15s; }
+#card-shuffle-anim .csa-c5 { --sf-a:   9deg; animation-delay: -0.10s; }
+#card-shuffle-anim .csa-c6 { --sf-a:  18deg; animation-delay: -0.05s; }
+#card-shuffle-anim .csa-c7 { --sf-a:  27deg; animation-delay:  0.00s; }
+@keyframes shuffle-fan {
+  0%, 10%   { transform: rotate(0deg)        translateY(0px); }
+  38%, 62%  { transform: rotate(var(--sf-a)) translateY(-5px); }
+  90%, 100% { transform: rotate(0deg)        translateY(0px); }
+}
+</style>
 
 <style scoped>
 .spo-backdrop {
