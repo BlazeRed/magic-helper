@@ -1,0 +1,328 @@
+<template>
+  <v-app theme="dark" class="app-root">
+    <v-main class="app-main">
+      <div v-if="gameStore.players.length > 0" :class="['game-grid', `grid-${gameStore.numPlayers}p`]">
+        <!-- ─── Player cards by seat ─── -->
+        <template v-for="slot in layoutSlots" :key="slot.area">
+          <div v-if="slot.type === 'player'" :style="{ gridArea: slot.area }">
+            <LifeCounter
+              :player="gameStore.players[slot.playerIndex!]!"
+              :highlighted="highlightedPlayerId === gameStore.players[slot.playerIndex!]!.id && isAnimating"
+              :rotation="slot.rotation ?? 0"
+            />
+          </div>
+        </template>
+
+        <!-- ─── Center controls ─── -->
+        <div class="controls-cell" style="grid-area: controls">
+          <v-btn
+            icon
+            size="large"
+            variant="tonal"
+            color="primary"
+            class="mb-2"
+            @click="settingsDialogOpen = true"
+          >
+            <v-icon>mdi-cog</v-icon>
+            <v-tooltip activator="parent" location="bottom">Game Settings</v-tooltip>
+          </v-btn>
+
+          <v-btn
+            icon
+            size="large"
+            variant="tonal"
+            color="error"
+            @click="confirmReset"
+          >
+            <v-icon>mdi-refresh</v-icon>
+            <v-tooltip activator="parent" location="bottom">Reset Game</v-tooltip>
+          </v-btn>
+        </div>
+      </div>
+
+      <!-- ─── First launch splash ─── -->
+      <div v-else class="splash-screen">
+        <div class="splash-content">
+          <v-icon size="80" color="primary" class="mb-4">mdi-cards-playing</v-icon>
+          <h1 class="text-h4 text-primary mb-2">MTG Helper</h1>
+          <p class="text-body-1 text-medium-emphasis mb-6">Commander Life Tracker</p>
+          <v-btn color="primary" size="large" @click="settingsDialogOpen = true">
+            <v-icon start>mdi-play</v-icon>
+            New Game
+          </v-btn>
+        </div>
+      </div>
+    </v-main>
+
+    <!-- ─── Winner snackbar ─── -->
+    <v-snackbar
+      v-model="showWinner"
+      :timeout="-1"
+      location="top"
+      color="success"
+      class="winner-snack"
+    >
+      <v-icon start>mdi-trophy</v-icon>
+      <strong>{{ gameStore.winner?.name }}</strong> wins!
+      <template #actions>
+        <v-btn variant="text" @click="showWinner = false">Dismiss</v-btn>
+      </template>
+    </v-snackbar>
+
+    <!-- ─── Reset confirm snackbar ─── -->
+    <v-snackbar v-model="showResetConfirm" :timeout="4000" location="bottom">
+      Reset all life totals?
+      <template #actions>
+        <v-btn color="error" variant="text" @click="doReset">Reset</v-btn>
+        <v-btn variant="text" @click="showResetConfirm = false">Cancel</v-btn>
+      </template>
+    </v-snackbar>
+
+    <!-- ─── Starting player overlay ─── -->
+    <StartingPlayerOverlay :visible="isAnimating" />
+
+    <!-- ─── Dialogs ─── -->
+    <GameSettingsDialog v-model="settingsDialogOpen" @start="onGameStart" />
+  </v-app>
+</template>
+
+<script setup lang="ts">
+import { ref, watch, onMounted, computed } from 'vue'
+import { useTheme } from 'vuetify'
+import { useGameStore } from './stores/gameStore'
+import { useSettingsStore } from './stores/settingsStore'
+import { useStartingPlayer } from './composables/useStartingPlayer'
+import LifeCounter from './components/LifeCounter.vue'
+import GameSettingsDialog from './components/GameSettingsDialog.vue'
+import StartingPlayerOverlay from './components/StartingPlayerOverlay.vue'
+
+const theme = useTheme()
+const gameStore = useGameStore()
+const settingsStore = useSettingsStore()
+const { highlightedPlayerId, isAnimating, runAnimation } = useStartingPlayer()
+
+// Sync accent color → Vuetify theme
+watch(() => settingsStore.accentColor, color => {
+  theme.themes.value.dark!.colors.primary = color
+}, { immediate: true })
+
+const settingsDialogOpen = ref(false)
+const showResetConfirm = ref(false)
+const showWinner = ref(false)
+
+// ─── Layout slot definitions per player count ───────────────────────────────
+
+interface LayoutSlot {
+  area: string
+  type: 'player' | 'controls'
+  playerIndex?: number
+  rotation?: number
+}
+
+const layoutSlots = computed<LayoutSlot[]>(() => {
+  const n = gameStore.numPlayers
+  const maps: Record<number, LayoutSlot[]> = {
+    2: [
+      { area: 'p1', type: 'player', playerIndex: 0, rotation: 180 },
+      { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
+      { area: 'controls', type: 'controls' },
+    ],
+    3: [
+      { area: 'p1', type: 'player', playerIndex: 0, rotation: 180 },
+      { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
+      { area: 'p3', type: 'player', playerIndex: 2, rotation: -90 },
+      { area: 'controls', type: 'controls' },
+    ],
+    4: [
+      { area: 'p1', type: 'player', playerIndex: 0, rotation: 0 },
+      { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
+      { area: 'p3', type: 'player', playerIndex: 2, rotation: 180 },
+      { area: 'p4', type: 'player', playerIndex: 3, rotation: 180 },
+      { area: 'controls', type: 'controls' },
+    ],
+    5: [
+      { area: 'p1', type: 'player', playerIndex: 0, rotation: 0 },
+      { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
+      { area: 'p3', type: 'player', playerIndex: 2, rotation: 180 },
+      { area: 'p4', type: 'player', playerIndex: 3, rotation: 180 },
+      { area: 'p5', type: 'player', playerIndex: 4, rotation: 90 },
+      { area: 'controls', type: 'controls' },
+    ],
+    6: [
+      { area: 'p1', type: 'player', playerIndex: 0, rotation: 0 },
+      { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
+      { area: 'p3', type: 'player', playerIndex: 2, rotation: 0 },
+      { area: 'p4', type: 'player', playerIndex: 3, rotation: 180 },
+      { area: 'p5', type: 'player', playerIndex: 4, rotation: 180 },
+      { area: 'p6', type: 'player', playerIndex: 5, rotation: 180 },
+      { area: 'controls', type: 'controls' },
+    ],
+  }
+  return maps[n] ?? maps[4]!
+})
+
+// ─── Winner watcher ─────────────────────────────────────────────────────────
+
+watch(() => gameStore.winner, val => {
+  if (val) showWinner.value = true
+})
+
+// ─── Reset helpers ───────────────────────────────────────────────────────────
+
+function confirmReset() {
+  showResetConfirm.value = true
+}
+
+function doReset() {
+  showResetConfirm.value = false
+  showWinner.value = false
+  gameStore.resetGame()
+  runAnimation()
+}
+
+// ─── Game start ─────────────────────────────────────────────────────────────
+
+async function onGameStart(numPlayers: number, life: number) {
+  settingsStore.ensurePlayerColors(
+    Array.from({ length: numPlayers }, (_, i) => i + 1)
+  )
+  gameStore.initGame(numPlayers, life)
+  await runAnimation()
+}
+
+// ─── Boot ────────────────────────────────────────────────────────────────────
+
+onMounted(async () => {
+  settingsStore.loadSettings()
+  const restored = gameStore.loadState()
+  if (restored) {
+    settingsStore.ensurePlayerColors(gameStore.players.map(p => p.id))
+    if (gameStore.gamePhase === 'idle') {
+      await runAnimation()
+    }
+  } else {
+    // First launch: open settings
+    settingsDialogOpen.value = true
+  }
+})
+</script>
+
+<style>
+html, body, #app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+.app-root, .app-main {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100dvh !important;
+}
+
+.v-main__wrap {
+  height: 100% !important;
+}
+</style>
+
+<style scoped>
+.app-main {
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+/* ─── Grid layouts ─────────────────────────────────────────────── */
+
+.game-grid {
+  width: 100%;
+  height: 100dvh;
+  display: grid;
+  gap: 4px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+/* 2 players */
+.grid-2p {
+  grid-template-rows: 1fr auto 1fr;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "p1"
+    "controls"
+    "p2";
+}
+
+/* 3 players */
+.grid-3p {
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "p1    p3"
+    "p2    controls";
+}
+
+/* 4 players */
+.grid-4p {
+  grid-template-rows: 1fr auto 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "p3       p4"
+    "controls controls"
+    "p1       p2";
+}
+
+/* 5 players */
+.grid-5p {
+  grid-template-rows: 1fr auto 1fr;
+  grid-template-columns: auto 1fr 1fr;
+  grid-template-areas:
+    ".   p3       p4"
+    "p5  controls controls"
+    ".   p1       p2";
+}
+
+/* 6 players */
+.grid-6p {
+  grid-template-rows: 1fr auto 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-areas:
+    "p4       p5       p6"
+    "controls controls controls"
+    "p1       p2       p3";
+}
+
+/* Grid cells: each player div fills its area */
+.game-grid > div {
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+/* Controls center */
+.controls-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px;
+}
+
+/* Splash screen */
+.splash-screen {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-content {
+  text-align: center;
+  padding: 32px;
+}
+</style>
