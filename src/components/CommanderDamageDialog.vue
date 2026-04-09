@@ -1,13 +1,22 @@
 <template>
   <v-dialog v-model="open" max-width="540" :scrim="true">
-    <v-card class="cmd-dialog" rounded="xl">
+    <v-card class="cmd-dialog" rounded="xl" :style="`transform: rotate(${dialogRotation})`">
 
       <!-- Title -->
       <v-card-title class="d-flex align-center justify-space-between pa-4 pb-2">
         <div class="d-flex align-center gap-2">
-          <div class="title-chip" :style="{ background: playerColor }" />
-          <v-icon size="18" class="mr-1">mdi-sword-cross</v-icon>
-          <span class="text-body-1 text-medium-emphasis">Commander Damage</span>
+          <v-icon size="18" class="mr-4" :style="{ color: playerColor }">mdi-sword-cross</v-icon>
+          <span
+            class="text-body-1 text-medium-emphasis"
+            style="display: flex; align-items: center; gap: 4px;"
+            title="Double-click to edit the name"
+          >
+            <PlayerNameEdit
+              :model-value="player.name"
+              @update:model-value="gameStore.setPlayerName(player.id, $event)"
+            />
+            <v-icon size="12" class="edit-hint">mdi-pencil</v-icon>
+          </span>
         </div>
         <v-btn icon size="small" variant="text" @click="open = false">
           <v-icon>mdi-close</v-icon>
@@ -23,9 +32,10 @@
         <div
           class="player-grid"
           :style="{
-            gridTemplateAreas: gridConfig.template,
+            gridTemplateAreas: gridConfig.template[player.id] ?? gridConfig.template[1],
             gridTemplateColumns: gridConfig.cols,
             gridTemplateRows: gridConfig.rows,
+            minHeight: gameStore.numPlayers === 5 ? '300px' : '180px',
           }"
         >
           <div
@@ -34,51 +44,7 @@
             class="grid-cell"
             :style="{ gridArea: `p${slot.id}` }"
           >
-            <!-- Current player's own cell -->
             <div
-              v-if="slot.id === player.id"
-              class="player-card player-card--self"
-              :style="{
-                borderColor: playerColor,
-                background: playerColorDim,
-              }"
-            >
-              <div class="card-color-strip" :style="{ background: playerColor }" />
-              <!-- Editable name -->
-              <div class="self-name-row">
-                <PlayerNameEdit
-                  :model-value="player.name"
-                  @update:model-value="gameStore.setPlayerName(player.id, $event)"
-                />
-                <v-icon size="12" class="edit-hint">mdi-pencil</v-icon>
-              </div>
-              <!-- Commander damage counter (self) -->
-              <div class="damage-counter">
-                <button
-                  class="dmg-btn"
-                  :disabled="damageFrom(player.id) <= 0"
-                  @click="gameStore.adjustCommanderDamage(player.id, player.id, -1)"
-                >−</button>
-                <span
-                  class="dmg-value"
-                  :class="{ 'dmg-value--danger': damageFrom(player.id) >= 18 }"
-                >{{ damageFrom(player.id) }}</span>
-                <button
-                  class="dmg-btn"
-                  @click="gameStore.adjustCommanderDamage(player.id, player.id, +1)"
-                >+</button>
-              </div>
-              <v-icon
-                v-if="damageFrom(player.id) >= 21"
-                size="14"
-                color="error"
-                class="skull-icon"
-              >mdi-skull</v-icon>
-            </div>
-
-            <!-- Opponent cell -->
-            <div
-              v-else
               class="player-card player-card--opponent"
               :style="{
                 borderColor: settingsStore.getPlayerColor(slot.id),
@@ -161,6 +127,13 @@ const settingsStore = useSettingsStore()
 
 const gridConfig = computed(() => getGridConfig(gameStore.numPlayers))
 
+const dialogRotation = computed(() => {
+  const config = gridConfig.value
+  const slot = config.slots.find(s => s.id === props.player.id)
+  console.log('Slot for player', props.player.id, slot)
+  return `${slot?.rotation ?? 0}deg`
+})
+
 const playerColor = computed(() => settingsStore.getPlayerColor(props.player.id))
 
 const playerColorDim = computed(() => hexToRgba(playerColor.value, 0.12))
@@ -209,7 +182,6 @@ function opponentName(id: number): string {
 /* ─── Positional grid ─────────────────────────────────── */
 .player-grid {
   display: grid;
-  min-height: 180px;
   gap: 8px;
 }
 
@@ -226,7 +198,7 @@ function opponentName(id: number): string {
   padding: 8px 8px 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 16px;
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -261,6 +233,7 @@ function opponentName(id: number): string {
   align-items: center;
   gap: 4px;
   min-width: 0;
+  font-weight: bold;
 }
 
 .edit-hint {
@@ -272,13 +245,14 @@ function opponentName(id: number): string {
 .damage-counter {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: auto;
+  gap: 8px;
+  flex-grow: 1;
+  justify-content: center;
 }
 
 .dmg-btn {
-  width: 28px;
-  height: 28px;
+  width: 100%;
+  height: 100%;
   border-radius: 6px;
   border: 1px solid rgba(255,255,255,0.2);
   background: rgba(255,255,255,0.08);
