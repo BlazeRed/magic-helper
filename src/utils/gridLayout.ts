@@ -5,7 +5,7 @@ export interface GridSlot {
 }
 
 export interface GridConfig {
-  template: string
+  template: { [key: number]: string }
   cols: string
   rows: string
   slots: GridSlot[]
@@ -19,7 +19,10 @@ export interface GridConfig {
 export function getGridConfig(numPlayers: number): GridConfig {
   const configs: Record<number, GridConfig> = {
     2: {
-      template: '"p1" "p2"',
+      template: {
+        1: '"p2" "p1"',
+        2: '"p1" "p2"',
+      },
       cols: '1fr',
       rows: '1fr 1fr',
       slots: [
@@ -28,7 +31,11 @@ export function getGridConfig(numPlayers: number): GridConfig {
       ],
     },
     3: {
-      template: '"p1 p3" "p2 p3"',
+      template: {
+        1: '"p3 p2" "p3 p1"',
+        2: '"p1 p3" "p2 p3"',
+        3: '"p2 p1" "p3 p3"',
+      },
       cols: '1fr 1fr',
       rows: '1fr 1fr',
       slots: [
@@ -38,7 +45,12 @@ export function getGridConfig(numPlayers: number): GridConfig {
       ],
     },
     4: {
-      template: '"p3 p4" "p1 p2"',
+      template: {
+        1: '"p3 p4" "p1 p2"',
+        2: '"p3 p4" "p1 p2"',
+        3: '"p2 p1" "p4 p3"',
+        4: '"p2 p1" "p4 p3"',
+      },
       cols: '1fr 1fr',
       rows: '1fr 1fr',
       slots: [
@@ -49,9 +61,15 @@ export function getGridConfig(numPlayers: number): GridConfig {
       ],
     },
     5: {
-      template: '"p5 p3 p4" "p5 p1 p2"',
-      cols: '1fr 1fr 1fr',
-      rows: '1fr 1fr',
+      template: {
+        1: '"p5 p3 p4" "p5 p1 p2"',
+        2: '"p5 p3 p4" "p5 p1 p2"',
+        3: '"p2 p1 p5" "p4 p3 p5"',
+        4: '"p2 p1 p5" "p4 p3 p5"',
+        5: '"p4 p4 p2 p2" "p3 p3 p1 p1" "p5 p5 p5 p5"',
+      },
+      cols: '1fr min(min-content, 1fr) 1fr',
+      rows: '1fr 1fr min(min-content, 1fr)',
       slots: [
         { id: 1, area: 'p1', rotation: 0 },
         { id: 2, area: 'p2', rotation: 0 },
@@ -61,7 +79,14 @@ export function getGridConfig(numPlayers: number): GridConfig {
       ],
     },
     6: {
-      template: '"p4 p5 p6" "p1 p2 p3"',
+      template: {
+        1: '"p4 p5 p6" "p1 p2 p3"',
+        2: '"p4 p5 p6" "p1 p2 p3"',
+        3: '"p4 p5 p6" "p1 p2 p3"',
+        4: '"p3 p2 p1" "p6 p5 p4"',
+        5: '"p3 p2 p1" "p6 p5 p4"',
+        6: '"p3 p2 p1" "p6 p5 p4"',
+      },
       cols: '1fr 1fr 1fr',
       rows: '1fr 1fr',
       slots: [

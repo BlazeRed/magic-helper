@@ -6,6 +6,7 @@
         <template v-for="slot in layoutSlots" :key="slot.area">
           <div v-if="slot.type === 'player'" :style="{ gridArea: slot.area }">
             <LifeCounter
+              :key="`player-${gameStore.players[slot.playerIndex!]!.id}-${gameTimestamp}`"
               :player="gameStore.players[slot.playerIndex!]!"
               :highlighted="highlightedPlayerId === gameStore.players[slot.playerIndex!]!.id && isAnimating"
               :rotation="slot.rotation ?? 0"
@@ -121,6 +122,7 @@ watch(() => settingsStore.accentColor, color => {
 const settingsDialogOpen = ref(false)
 const showResetConfirm = ref(false)
 const showWinner = ref(false)
+const gameTimestamp = ref(Date.now())
 
 // ─── Layout slot definitions per player count ───────────────────────────────
 
@@ -179,6 +181,13 @@ watch(() => gameStore.winner, val => {
   if (val) showWinner.value = true
 })
 
+// ─── Page size watcher ───────────────────────────────────────────────────────
+
+window.addEventListener("resize", () => {
+  // Trigger re-render of life counters to update their size
+  gameTimestamp.value = Date.now()
+})
+
 // ─── Reset helpers ───────────────────────────────────────────────────────────
 
 function confirmReset() {
@@ -199,6 +208,7 @@ async function onGameStart(numPlayers: number, life: number) {
     Array.from({ length: numPlayers }, (_, i) => i + 1)
   )
   gameStore.initGame(numPlayers, life)
+  gameTimestamp.value = Date.now()
   await runAnimation()
 }
 
@@ -313,7 +323,7 @@ html, body, #app {
   min-height: 0;
   min-width: 0;
   display: flex;
-  align-items: stretch;
+  align-items: center;
 }
 
 /* Controls center */

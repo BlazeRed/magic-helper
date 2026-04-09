@@ -2,7 +2,7 @@
   <div
     class="cmd-pip-grid"
     :style="{
-      gridTemplateAreas: gridConfig.template,
+      gridTemplateAreas: gridConfig.template[player.id] ?? gridConfig.template[1],
       gridTemplateColumns: gridConfig.cols,
       gridTemplateRows: gridConfig.rows,
     }"
