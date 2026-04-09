@@ -209,12 +209,14 @@ function opponentName(id: number): string {
 /* ─── Positional grid ─────────────────────────────────── */
 .player-grid {
   display: grid;
+  min-height: 180px;
   gap: 8px;
 }
 
 .grid-cell {
-  min-width: 0;
-  min-height: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
 /* ─── Player cards inside grid ────────────────────────── */
@@ -225,7 +227,8 @@ function opponentName(id: number): string {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  position: relative;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
   min-height: 80px;
 }

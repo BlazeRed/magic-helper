@@ -70,13 +70,14 @@ function playerName(id: number): string {
   display: grid;
   gap: 3px;
   cursor: pointer;
+  min-height: 55px;
   /* Size scales with content; each cell is 26px */
   --cell: 26px;
 }
 
 .pip-cell {
-  width: var(--cell);
-  height: var(--cell);
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

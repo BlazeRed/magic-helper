@@ -260,7 +260,7 @@ html, body, #app {
 
 /* 2 players */
 .grid-2p {
-  grid-template-rows: 1fr auto 1fr;
+  grid-template-rows: 1fr min-content 1fr;
   grid-template-columns: 1fr;
   grid-template-areas:
     "p1"
@@ -270,16 +270,17 @@ html, body, #app {
 
 /* 3 players */
 .grid-3p {
-  grid-template-rows: 1fr 1fr;
-  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr min-content 1fr;
+  grid-template-columns: 1fr min-content 1fr;
   grid-template-areas:
-    "p1    p3"
-    "p2    controls";
+    "p1    .          p3"
+    ".     controls   p3"
+    "p2    .          p3";
 }
 
 /* 4 players */
 .grid-4p {
-  grid-template-rows: 1fr auto 1fr;
+  grid-template-rows: 1fr min-content 1fr;
   grid-template-columns: 1fr 1fr;
   grid-template-areas:
     "p3       p4"
@@ -289,22 +290,22 @@ html, body, #app {
 
 /* 5 players */
 .grid-5p {
-  grid-template-rows: 1fr auto 1fr;
-  grid-template-columns: auto 1fr 1fr;
+  grid-template-rows: 1fr min-content 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   grid-template-areas:
-    ".   p3       p4"
-    "p5  controls controls"
-    ".   p1       p2";
+    "p5   p3       p4"
+    "p5  controls  ."
+    "p5   p1       p2";
 }
 
 /* 6 players */
 .grid-6p {
-  grid-template-rows: 1fr auto 1fr;
+  grid-template-rows: 1fr min-content 1fr;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-areas:
-    "p4       p5       p6"
-    "controls controls controls"
-    "p1       p2       p3";
+    "p4     p5         p6"
+    ".      controls   ."
+    "p1     p2         p3";
 }
 
 /* Grid cells: each player div fills its area */

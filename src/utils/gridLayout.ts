@@ -28,7 +28,7 @@ export function getGridConfig(numPlayers: number): GridConfig {
       ],
     },
     3: {
-      template: '"p1 p3" "p2 ."',
+      template: '"p1 p3" "p2 p3"',
       cols: '1fr 1fr',
       rows: '1fr 1fr',
       slots: [
@@ -49,9 +49,9 @@ export function getGridConfig(numPlayers: number): GridConfig {
       ],
     },
     5: {
-      template: '". p3 p4" "p5 . ." ". p1 p2"',
+      template: '"p5 p3 p4" "p5 p1 p2"',
       cols: '1fr 1fr 1fr',
-      rows: '1fr 1fr 1fr',
+      rows: '1fr 1fr',
       slots: [
         { id: 1, area: 'p1', rotation: 0 },
         { id: 2, area: 'p2', rotation: 0 },
