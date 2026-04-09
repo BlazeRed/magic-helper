@@ -87,8 +87,8 @@
           All life totals and commander damage will be reset to the starting values.
         </v-card-text>
         <v-card-actions class="pa-4 pt-0 gap-2">
-          <v-spacer />
           <v-btn variant="text" @click="showResetConfirm = false">Cancel</v-btn>
+          <v-spacer />
           <v-btn color="error" variant="elevated" @click="doReset">
             <v-icon start>mdi-refresh</v-icon>
             Reset

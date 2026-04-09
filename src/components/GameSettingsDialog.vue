@@ -46,6 +46,10 @@
         >
           Cancel
         </v-btn>
+        <div v-else class="brand-mark">
+          <span class="brand-title">HelM</span>
+          <span class="brand-tagline">Life Tracker</span>
+        </div>
         <v-spacer />
         <v-btn
           color="primary"
@@ -134,5 +138,30 @@ function confirm() {
   background: rgba(var(--v-theme-primary), 0.15);
   color: rgb(var(--v-theme-primary));
   box-shadow: 0 0 8px rgba(var(--v-theme-primary), 0.3);
+}
+
+.brand-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.brand-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: 1.9em;
+  font-weight: 700;
+  color: rgb(var(--v-theme-primary));
+  letter-spacing: 0.05em;
+  line-height: 1.1em;
+}
+
+.brand-tagline {
+  font-family: 'Cinzel', serif;
+  font-size: 0.76em;
+  color: rgba(255, 255, 255, 0.42);
+  line-height: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 </style>
