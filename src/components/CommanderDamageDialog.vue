@@ -52,18 +52,28 @@
                 />
                 <v-icon size="12" class="edit-hint">mdi-pencil</v-icon>
               </div>
-              <!-- Editable life total -->
+              <!-- Commander damage counter (self) -->
               <div class="damage-counter">
                 <button
                   class="dmg-btn"
-                  @click="gameStore.adjustLife(player.id, -1)"
+                  :disabled="damageFrom(player.id) <= 0"
+                  @click="gameStore.adjustCommanderDamage(player.id, player.id, -1)"
                 >−</button>
-                <span class="dmg-value life-value">{{ player.life }} <span class="life-label">♥</span></span>
+                <span
+                  class="dmg-value"
+                  :class="{ 'dmg-value--danger': damageFrom(player.id) >= 18 }"
+                >{{ damageFrom(player.id) }}</span>
                 <button
                   class="dmg-btn"
-                  @click="gameStore.adjustLife(player.id, +1)"
+                  @click="gameStore.adjustCommanderDamage(player.id, player.id, +1)"
                 >+</button>
               </div>
+              <v-icon
+                v-if="damageFrom(player.id) >= 21"
+                size="14"
+                color="error"
+                class="skull-icon"
+              >mdi-skull</v-icon>
             </div>
 
             <!-- Opponent cell -->
@@ -253,15 +263,6 @@ function opponentName(id: number): string {
 .edit-hint {
   opacity: 0.4;
   flex-shrink: 0;
-}
-
-.life-value {
-  color: #fff;
-}
-
-.life-label {
-  font-size: 0.75rem;
-  opacity: 0.7;
 }
 
 /* Damage counter */

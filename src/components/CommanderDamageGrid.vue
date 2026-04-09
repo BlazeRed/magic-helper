@@ -14,12 +14,16 @@
       class="pip-cell"
       :style="{ gridArea: `p${slot.id}` }"
     >
-      <!-- Self marker -->
+      <!-- Self pip (same style as opponent, shows self-damage) -->
       <div
         v-if="slot.id === player.id"
-        class="self-dot"
-        :style="{ borderColor: settingsStore.getPlayerColor(player.id) }"
-      />
+        class="pip-dot"
+        :class="{ 'pip-dot--danger': damage(player.id) >= 18 }"
+        :style="{ background: settingsStore.getPlayerColor(player.id) }"
+        :title="`${player.name}: ${damage(player.id)}`"
+      >
+        <span v-if="damage(player.id) > 0" class="pip-num">{{ damage(player.id) }}</span>
+      </div>
       <!-- Opponent pip -->
       <div
         v-else
@@ -100,11 +104,4 @@ function playerName(id: number): string {
   line-height: 1;
 }
 
-.self-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 2px solid currentColor;
-  opacity: 0.4;
-}
 </style>
