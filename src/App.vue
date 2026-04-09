@@ -16,28 +16,36 @@
 
         <!-- ─── Center controls ─── -->
         <div class="controls-cell" style="grid-area: controls">
-          <v-btn
-            icon
-            size="large"
-            variant="tonal"
-            color="primary"
-            class="mb-2"
-            @click="settingsDialogOpen = true"
-          >
-            <v-icon>mdi-cog</v-icon>
-            <v-tooltip activator="parent" location="bottom">Game Settings</v-tooltip>
-          </v-btn>
+          <div class="brand-mark">
+            <v-icon size="14" color="primary">mdi-cards-playing</v-icon>
+            <span class="brand-title">The Arcane Codex</span>
+          </div>
 
-          <v-btn
-            icon
-            size="large"
-            variant="tonal"
-            color="error"
-            @click="confirmReset"
-          >
-            <v-icon>mdi-refresh</v-icon>
-            <v-tooltip activator="parent" location="bottom">Reset Game</v-tooltip>
-          </v-btn>
+          <div class="controls-buttons">
+            <v-btn
+              icon
+              size="large"
+              variant="tonal"
+              color="primary"
+              @click="settingsDialogOpen = true"
+            >
+              <v-icon>mdi-cog</v-icon>
+              <v-tooltip activator="parent" location="bottom">Game Settings</v-tooltip>
+            </v-btn>
+
+            <v-btn
+              icon
+              size="large"
+              variant="tonal"
+              color="error"
+              @click="confirmReset"
+            >
+              <v-icon>mdi-refresh</v-icon>
+              <v-tooltip activator="parent" location="bottom">Reset Game</v-tooltip>
+            </v-btn>
+          </div>
+
+          <span class="brand-tagline">Commander Life Tracker</span>
         </div>
       </div>
 
@@ -45,8 +53,8 @@
       <div v-else class="splash-screen">
         <div class="splash-content">
           <v-icon size="80" color="primary" class="mb-4">mdi-cards-playing</v-icon>
-          <h1 class="text-h4 text-primary mb-2">MTG Helper</h1>
-          <p class="text-body-1 text-medium-emphasis mb-6">Commander Life Tracker</p>
+          <h1 class="splash-brand mb-1">The Arcane Codex</h1>
+          <p class="splash-tagline mb-6">Commander Life Tracker</p>
           <v-btn color="primary" size="large" @click="settingsDialogOpen = true">
             <v-icon start>mdi-play</v-icon>
             New Game
@@ -230,6 +238,8 @@ onMounted(async () => {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700;900&display=swap');
+
 html, body, #app {
   margin: 0;
   padding: 0;
@@ -237,6 +247,7 @@ html, body, #app {
   height: 100%;
   overflow: hidden;
   touch-action: manipulation;
+  font-family: 'Cinzel', serif;
 }
 
 .app-root, .app-main {
@@ -329,10 +340,41 @@ html, body, #app {
 /* Controls center */
 .controls-cell {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 6px;
   padding: 8px;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.brand-title {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: clamp(0.55rem, 1.4vw, 0.85rem);
+  font-weight: 700;
+  color: rgb(var(--v-theme-primary));
+  letter-spacing: 0.04em;
+}
+
+.controls-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-tagline {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(0.4rem, 0.9vw, 0.6rem);
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* Splash screen */
@@ -347,5 +389,22 @@ html, body, #app {
 .splash-content {
   text-align: center;
   padding: 32px;
+}
+
+.splash-brand {
+  font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 700;
+  color: rgb(var(--v-theme-primary));
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.splash-tagline {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 </style>

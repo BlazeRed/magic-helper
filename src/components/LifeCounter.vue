@@ -218,6 +218,7 @@ onMounted(() => {
 }
 
 .dead-label {
+  font-family: 'Cinzel', serif;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.15em;
@@ -284,11 +285,12 @@ onMounted(() => {
 }
 
 .lc-life {
+  font-family: 'Cinzel', serif;
   font-size: clamp(2.5rem, 8vw, 4.5rem);
   font-weight: 700;
   line-height: 1;
   color: #fff;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .lc-delta {
