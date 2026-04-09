@@ -139,6 +139,15 @@ export const useGameStore = defineStore('game', () => {
     startingPlayerId.value = id
     gamePhase.value = 'playing'
     saveState()
+
+    // Hide the crown after 10 seconds
+    setTimeout(() => {
+      const p = players.value.find(p => p.id === id)
+      if (p) {
+        p.isStartingPlayer = false
+        saveState()
+      }
+    }, 10_000)
   }
 
   function adjustLife(playerId: number, delta: number) {

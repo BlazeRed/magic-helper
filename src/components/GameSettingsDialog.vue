@@ -36,25 +36,16 @@
             {{ life }}
           </button>
         </div>
-
-        <v-divider class="my-4" />
-
-        <!-- Global accent color -->
-        <div class="section-label mb-2">App Accent Color</div>
-        <div class="color-presets mb-2">
-          <button
-            v-for="preset in MTG_COLORS"
-            :key="preset.hex"
-            class="color-swatch"
-            :class="{ 'color-swatch--active': settingsStore.accentColor === preset.hex }"
-            :style="{ background: preset.hex }"
-            :title="preset.name"
-            @click="settingsStore.setAccentColor(preset.hex)"
-          />
-        </div>
       </v-card-text>
 
-      <v-card-actions class="pa-4 pt-0">
+      <v-card-actions class="pa-4 pt-0 gap-2">
+        <v-btn
+          v-if="hasActiveGame"
+          variant="text"
+          @click="open = false"
+        >
+          Cancel
+        </v-btn>
         <v-spacer />
         <v-btn
           color="primary"
@@ -72,9 +63,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useSettingsStore } from '../stores/settingsStore'
-import { MTG_COLORS } from '../stores/settingsStore'
+import { ref, computed } from 'vue'
+import { useGameStore } from '../stores/gameStore'
 
 const props = defineProps<{ modelValue: boolean }>()
 const emit = defineEmits<{
@@ -87,17 +77,11 @@ const open = computed({
   set: val => emit('update:modelValue', val),
 })
 
-const settingsStore = useSettingsStore()
+const gameStore = useGameStore()
+const hasActiveGame = computed(() => gameStore.players.length > 0)
 
 const selectedPlayers = ref(4)
 const selectedLife = ref(40)
-
-// Sync defaults when reopened
-watch(open, val => {
-  if (val) {
-    // keep user selections sticky
-  }
-})
 
 function confirm() {
   emit('start', selectedPlayers.value, selectedLife.value)
@@ -150,32 +134,5 @@ function confirm() {
   background: rgba(var(--v-theme-primary), 0.15);
   color: rgb(var(--v-theme-primary));
   box-shadow: 0 0 8px rgba(var(--v-theme-primary), 0.3);
-}
-
-.color-presets {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.color-swatch {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 3px solid transparent;
-  cursor: pointer;
-  transition: transform 0.15s, border-color 0.15s;
-  outline: none;
-  padding: 0;
-}
-
-.color-swatch:hover {
-  transform: scale(1.15);
-}
-
-.color-swatch--active {
-  border-color: #fff;
-  transform: scale(1.1);
-  box-shadow: 0 0 8px 2px rgba(255,255,255,0.4);
 }
 </style>

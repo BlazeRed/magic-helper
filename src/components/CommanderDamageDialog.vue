@@ -1,11 +1,19 @@
 <template>
-  <v-dialog v-model="open" max-width="480" :scrim="true">
+  <v-dialog v-model="open" max-width="540" :scrim="true">
     <v-card class="cmd-dialog" rounded="xl">
-      <!-- Title -->
+
+      <!-- Title with editable player name -->
       <v-card-title class="d-flex align-center justify-space-between pa-4 pb-2">
         <div class="d-flex align-center gap-2">
-          <v-icon :color="playerColor" class="mr-2">mdi-sword-cross</v-icon>
-          <span>{{ player.name }}</span>
+          <div
+            class="title-chip"
+            :style="{ background: playerColor }"
+          />
+          <v-icon size="18" class="mr-1">mdi-sword-cross</v-icon>
+          <PlayerNameEdit
+            :model-value="player.name"
+            @update:model-value="gameStore.setPlayerName(player.id, $event)"
+          />
         </div>
         <v-btn icon size="small" variant="text" @click="open = false">
           <v-icon>mdi-close</v-icon>
@@ -15,65 +23,83 @@
       <v-divider />
 
       <v-card-text class="pa-4">
-        <!-- Commander damage section -->
-        <div class="section-label mb-3">Commander Damage Received</div>
+        <div class="section-label mb-3">Commander Damage</div>
 
-        <div class="cmd-rows">
+        <!-- Positional player grid -->
+        <div
+          class="player-grid"
+          :style="{
+            gridTemplateAreas: gridConfig.template,
+            gridTemplateColumns: gridConfig.cols,
+            gridTemplateRows: gridConfig.rows,
+          }"
+        >
           <div
-            v-for="opp in opponents"
-            :key="opp.id"
-            class="cmd-row"
+            v-for="slot in gridConfig.slots"
+            :key="slot.id"
+            class="grid-cell"
+            :style="{ gridArea: `p${slot.id}` }"
           >
-            <!-- Color chip -->
+            <!-- Current player's own cell -->
             <div
-              class="opp-chip"
-              :style="{ background: settingsStore.getPlayerColor(opp.id) }"
-            />
-
-            <!-- Opponent name -->
-            <span class="opp-name text-truncate">{{ opp.name }}</span>
-
-            <!-- Counter controls -->
-            <div class="cmd-counter">
-              <v-btn
-                icon
-                size="small"
-                variant="tonal"
-                :disabled="damageFrom(opp.id) <= 0"
-                @click="gameStore.adjustCommanderDamage(player.id, opp.id, -1)"
-              >
-                <v-icon>mdi-minus</v-icon>
-              </v-btn>
-
-              <span
-                class="cmd-value"
-                :class="{ 'cmd-value--danger': damageFrom(opp.id) >= 18 }"
-              >
-                {{ damageFrom(opp.id) }}
-              </span>
-
-              <v-btn
-                icon
-                size="small"
-                variant="tonal"
-                :color="damageFrom(opp.id) >= 21 ? 'error' : undefined"
-                @click="gameStore.adjustCommanderDamage(player.id, opp.id, +1)"
-              >
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
+              v-if="slot.id === player.id"
+              class="player-card player-card--self"
+              :style="{
+                borderColor: playerColor,
+                background: `${playerColorDim}`,
+              }"
+            >
+              <div
+                class="card-color-strip"
+                :style="{ background: playerColor }"
+              />
+              <span class="card-name self-name">{{ player.name }}</span>
+              <span class="self-life">{{ player.life }} ♥</span>
             </div>
 
-            <!-- Danger skull at 21 -->
-            <v-icon v-if="damageFrom(opp.id) >= 21" size="18" color="error">mdi-skull</v-icon>
-            <div v-else style="width:18px" />
+            <!-- Opponent cell -->
+            <div
+              v-else
+              class="player-card player-card--opponent"
+              :style="{
+                borderColor: settingsStore.getPlayerColor(slot.id),
+                background: opponentColorDim(slot.id),
+              }"
+            >
+              <div
+                class="card-color-strip"
+                :style="{ background: settingsStore.getPlayerColor(slot.id) }"
+              />
+              <span class="card-name">{{ opponentName(slot.id) }}</span>
+              <div class="damage-counter">
+                <button
+                  class="dmg-btn"
+                  :disabled="damageFrom(slot.id) <= 0"
+                  @click="gameStore.adjustCommanderDamage(player.id, slot.id, -1)"
+                >−</button>
+                <span
+                  class="dmg-value"
+                  :class="{ 'dmg-value--danger': damageFrom(slot.id) >= 18 }"
+                >{{ damageFrom(slot.id) }}</span>
+                <button
+                  class="dmg-btn"
+                  @click="gameStore.adjustCommanderDamage(player.id, slot.id, +1)"
+                >+</button>
+              </div>
+              <v-icon
+                v-if="damageFrom(slot.id) >= 21"
+                size="14"
+                color="error"
+                class="skull-icon"
+              >mdi-skull</v-icon>
+            </div>
           </div>
         </div>
 
         <v-divider class="my-4" />
 
-        <!-- Player color section -->
+        <!-- Player color presets -->
         <div class="section-label mb-3">Player Color</div>
-
         <div class="color-presets">
           <button
             v-for="preset in MTG_COLORS"
@@ -96,6 +122,8 @@ import type { Player } from '../stores/gameStore'
 import { useGameStore } from '../stores/gameStore'
 import { useSettingsStore } from '../stores/settingsStore'
 import { MTG_COLORS } from '../stores/settingsStore'
+import { getGridConfig } from '../utils/gridLayout'
+import PlayerNameEdit from './PlayerNameEdit.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -112,20 +140,43 @@ const open = computed({
 const gameStore = useGameStore()
 const settingsStore = useSettingsStore()
 
+const gridConfig = computed(() => getGridConfig(gameStore.numPlayers))
+
 const playerColor = computed(() => settingsStore.getPlayerColor(props.player.id))
 
-const opponents = computed(() =>
-  props.allPlayers.filter(p => p.id !== props.player.id)
-)
+const playerColorDim = computed(() => hexToRgba(playerColor.value, 0.12))
+
+function opponentColorDim(id: number): string {
+  return hexToRgba(settingsStore.getPlayerColor(id), 0.08)
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const h = hex.replace('#', '')
+  const r = parseInt(h.substring(0, 2), 16)
+  const g = parseInt(h.substring(2, 4), 16)
+  const b = parseInt(h.substring(4, 6), 16)
+  return `rgba(${r},${g},${b},${alpha})`
+}
 
 function damageFrom(sourceId: number): number {
   return props.player.commanderDamage[sourceId] ?? 0
+}
+
+function opponentName(id: number): string {
+  return props.allPlayers.find(p => p.id === id)?.name ?? `Player ${id}`
 }
 </script>
 
 <style scoped>
 .cmd-dialog {
   background: #1e1e1e;
+}
+
+.title-chip {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .section-label {
@@ -136,51 +187,118 @@ function damageFrom(sourceId: number): number {
   color: rgba(255,255,255,0.5);
 }
 
-.cmd-rows {
+/* ─── Positional grid ─────────────────────────────────── */
+.player-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.grid-cell {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ─── Player cards inside grid ────────────────────────── */
+.player-card {
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 8px 8px 8px 10px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
+  position: relative;
+  overflow: hidden;
+  min-height: 80px;
 }
 
-.cmd-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.card-color-strip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 10px 0 0 10px;
 }
 
-.opp-chip {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  box-shadow: 0 0 4px 1px currentColor;
+.card-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255,255,255,0.85);
 }
 
-.opp-name {
-  flex: 1;
-  font-size: 0.9rem;
-  min-width: 0;
+/* Self card */
+.player-card--self {
+  opacity: 1;
 }
 
-.cmd-counter {
+.self-name {
+  color: #fff;
+}
+
+.self-life {
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  margin-top: auto;
+}
+
+/* Damage counter */
+.damage-counter {
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-top: auto;
 }
 
-.cmd-value {
-  font-size: 1.2rem;
+.dmg-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 1.1rem;
   font-weight: 700;
-  min-width: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+  padding: 0;
+  line-height: 1;
+}
+
+.dmg-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.15);
+}
+
+.dmg-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.dmg-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  min-width: 28px;
   text-align: center;
 }
 
-.cmd-value--danger {
+.dmg-value--danger {
   color: #ff5252;
-  text-shadow: 0 0 8px rgba(255, 82, 82, 0.6);
+  text-shadow: 0 0 6px rgba(255, 82, 82, 0.6);
 }
 
-/* Color presets */
+.skull-icon {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+}
+
+/* ─── Color presets ───────────────────────────────────── */
 .color-presets {
   display: flex;
   gap: 10px;

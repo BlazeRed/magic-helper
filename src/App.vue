@@ -69,14 +69,26 @@
       </template>
     </v-snackbar>
 
-    <!-- ─── Reset confirm snackbar ─── -->
-    <v-snackbar v-model="showResetConfirm" :timeout="4000" location="bottom">
-      Reset all life totals?
-      <template #actions>
-        <v-btn color="error" variant="text" @click="doReset">Reset</v-btn>
-        <v-btn variant="text" @click="showResetConfirm = false">Cancel</v-btn>
-      </template>
-    </v-snackbar>
+    <!-- ─── Reset confirm dialog ─── -->
+    <v-dialog v-model="showResetConfirm" max-width="340">
+      <v-card rounded="xl" color="#1e1e1e">
+        <v-card-title class="pa-4 pb-2">
+          <v-icon color="error" class="mr-2">mdi-refresh</v-icon>
+          Reset Game?
+        </v-card-title>
+        <v-card-text class="pa-4 pt-0 text-medium-emphasis">
+          All life totals and commander damage will be reset to the starting values.
+        </v-card-text>
+        <v-card-actions class="pa-4 pt-0 gap-2">
+          <v-spacer />
+          <v-btn variant="text" @click="showResetConfirm = false">Cancel</v-btn>
+          <v-btn color="error" variant="elevated" @click="doReset">
+            <v-icon start>mdi-refresh</v-icon>
+            Reset
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- ─── Starting player overlay ─── -->
     <StartingPlayerOverlay :visible="isAnimating" />
