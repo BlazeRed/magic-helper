@@ -17,8 +17,7 @@
         <!-- ─── Center controls ─── -->
         <div class="controls-cell" style="grid-area: controls">
           <div class="brand-mark">
-            <v-icon size="14" color="primary">mdi-cards-playing</v-icon>
-            <span class="brand-title">The Arcane Codex</span>
+            <span class="brand-title">Helma</span>
           </div>
 
           <div class="controls-buttons">
@@ -52,8 +51,7 @@
       <!-- ─── First launch splash ─── -->
       <div v-else class="splash-screen">
         <div class="splash-content">
-          <v-icon size="80" color="primary" class="mb-4">mdi-cards-playing</v-icon>
-          <h1 class="splash-brand mb-1">The Arcane Codex</h1>
+          <h1 class="splash-brand mb-1">Helma</h1>
           <p class="splash-tagline mb-6">Commander Life Tracker</p>
           <v-btn color="primary" size="large" @click="settingsDialogOpen = true">
             <v-icon start>mdi-play</v-icon>
