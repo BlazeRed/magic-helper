@@ -1,0 +1,92 @@
+/*
+ * HelM design tokens — "Grimoire" direction.
+ * Dark only. Prefix: --hx-
+ * Rules: no shadows, no pill radii, depth comes from borders and tone.
+ * Signature marks: double frame, diamond (◆), fading rule.
+ */
+:root {
+  color-scheme: dark;
+
+  /* ── Surfaces ─────────────────────────────── */
+  --hx-bg:         #14110d;
+  --hx-bg-deep:    #0c0a08; /* behind dialogs/sheets */
+  --hx-surface:    #1b1712;
+  --hx-surface-2:  #221d16;
+
+  /* ── Lines ────────────────────────────────── */
+  --hx-line:        #3a3122;
+  --hx-line-soft:   #2a2318;
+  --hx-line-strong: #5a4a2c;
+
+  /* ── Text ─────────────────────────────────── */
+  --hx-ink-strong: #f3e8cc;
+  --hx-ink:        #e8dcc0;
+  --hx-ink-muted:  #b9a97f;
+  --hx-ink-faint:  #8d7f5e; /* ≥4.5:1 on bg; small caps labels only */
+  --hx-ink-on-gold: #14110d;
+
+  /* ── Accent & status ──────────────────────── */
+  --hx-gold:        #c9a95c; /* primary action, selection */
+  --hx-gold-hover:  #d8bb74;
+  --hx-danger:      #d9795f;
+  --hx-success:     #7fb069;
+
+  /* ── Player colors (mana-inspired) ────────── */
+  --hx-p-red:    #d9795f;
+  --hx-p-blue:   #6aa5d9;
+  --hx-p-green:  #7fb069;
+  --hx-p-black:  #a98bd9;
+  --hx-p-white:  #e6d9a8;
+  --hx-p-silver: #9aa7ad;
+  --hx-p-void:   #4aa59b;
+
+  /* ── Typography ───────────────────────────── */
+  --hx-font-serif: 'Cormorant Garamond', 'Cormorant', Georgia, serif;
+  --hx-font-sans:  'Inter', system-ui, sans-serif; /* tiny uppercase labels only */
+
+  --hx-fs-label:   0.75rem;   /* 12px sans, uppercase, tracked */
+  --hx-fs-body:    1.25rem;   /* 20px serif — serif reads small */
+  --hx-fs-lead:    1.5rem;    /* 24px */
+  --hx-fs-title:   2.25rem;   /* 36px, uppercase, tracked */
+  --hx-fs-display: 4rem;      /* 64px logo / headings */
+  --hx-fs-life:    9.5rem;    /* 152px life total — scale with clamp() per card */
+
+  --hx-tracking-label: 0.2em;
+  --hx-tracking-title: 0.1em;
+  --hx-tracking-button: 0.14em;
+
+  /* ── Spacing (4px base) ───────────────────── */
+  --hx-s-1: 0.25rem;
+  --hx-s-2: 0.5rem;
+  --hx-s-3: 0.75rem;
+  --hx-s-4: 1rem;
+  --hx-s-5: 1.5rem;
+  --hx-s-6: 2rem;
+  --hx-s-7: 3rem;
+
+  /* ── Shape ────────────────────────────────── */
+  --hx-radius:    2px;  /* controls */
+  --hx-radius-lg: 4px;  /* cards, dialogs */
+  --hx-border:    1px solid var(--hx-line);
+  --hx-border-strong: 1px solid var(--hx-line-strong);
+  --hx-frame-inset: 5px; /* inner frame offset */
+
+  /* ── Sizing ───────────────────────────────── */
+  --hx-tap:        2.75rem; /* 44px min touch target */
+  --hx-tap-lg:     3.5rem;  /* 56px steppers, segmented */
+  --hx-button-h:   3.5rem;
+
+  /* ── Layers ───────────────────────────────── */
+  --hx-z-dialog:  100;
+  --hx-z-overlay: 200;
+  --hx-z-toast:   300;
+
+  /* ── Motion ───────────────────────────────── */
+  --hx-ease: cubic-bezier(0.2, 0, 0, 1);
+  --hx-dur-fast: 120ms;
+  --hx-dur: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --hx-dur-fast: 0ms; --hx-dur: 0ms; }
+}
