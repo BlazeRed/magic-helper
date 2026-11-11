@@ -1,7 +1,9 @@
+export type Rotation = 0 | 90 | 180 | 270
+
 export interface GridSlot {
   id: number
   area: string
-  rotation: number
+  rotation: Rotation
 }
 
 export interface GridConfig {
@@ -41,7 +43,7 @@ export function getGridConfig(numPlayers: number): GridConfig {
       slots: [
         { id: 1, area: 'p1', rotation: 180 },
         { id: 2, area: 'p2', rotation: 0 },
-        { id: 3, area: 'p3', rotation: -90 },
+        { id: 3, area: 'p3', rotation: 270 },
       ],
     },
     4: {
@@ -75,7 +77,7 @@ export function getGridConfig(numPlayers: number): GridConfig {
         { id: 2, area: 'p2', rotation: 0 },
         { id: 3, area: 'p3', rotation: 180 },
         { id: 4, area: 'p4', rotation: 180 },
-        { id: 5, area: 'p5', rotation: -90 },
+        { id: 5, area: 'p5', rotation: 270 },
       ],
     },
     6: {
@@ -100,4 +102,29 @@ export function getGridConfig(numPlayers: number): GridConfig {
     },
   }
   return configs[numPlayers] ?? configs[4]!
+}
+
+export interface BoardLayout {
+  areas: string
+  cols: string
+  rows: string
+  seats: GridSlot[]
+}
+
+// Main game board: seat areas plus a `controls` strip. Seats come from getGridConfig.
+const BOARD_AREAS: Record<number, Pick<BoardLayout, 'areas' | 'cols'>> = {
+  2: { cols: 'minmax(0, 1fr)', areas: '"p1" "controls" "p2"' },
+  3: { cols: 'repeat(2, minmax(0, 1fr))', areas: '"p1 p3" "controls p3" "p2 p3"' },
+  4: { cols: 'repeat(2, minmax(0, 1fr))', areas: '"p3 p4" "controls controls" "p1 p2"' },
+  5: { cols: 'repeat(3, minmax(0, 1fr))', areas: '"p3 p4 p5" "controls controls p5" "p1 p2 p5"' },
+  6: { cols: 'repeat(3, minmax(0, 1fr))', areas: '"p4 p5 p6" "controls controls controls" "p1 p2 p3"' },
+}
+
+export function getBoardLayout(numPlayers: number): BoardLayout {
+  const n = BOARD_AREAS[numPlayers] ? numPlayers : 4
+  return {
+    ...BOARD_AREAS[n]!,
+    rows: 'minmax(0, 1fr) auto minmax(0, 1fr)',
+    seats: getGridConfig(n).slots,
+  }
 }

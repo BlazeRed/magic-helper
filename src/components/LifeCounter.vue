@@ -12,9 +12,7 @@
       :style="{
         '--player-color': playerColor,
         '--player-color-dim': playerColorDim,
-        '--rotation': `${rotation}deg`,
       }"
-      :id="`player-${player.id}`"
       rounded="lg"
       elevation="6"
     >
@@ -93,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import type { Player } from '../stores/gameStore'
 import { useGameStore } from '../stores/gameStore'
 import { useSettingsStore } from '../stores/settingsStore'
@@ -105,7 +103,6 @@ import CommanderDamageDialog from './CommanderDamageDialog.vue'
 const props = defineProps<{
   player: Player
   highlighted: boolean
-  rotation: number
 }>()
 
 const gameStore = useGameStore()
@@ -127,35 +124,6 @@ const playerColorDim = computed(() => {
 const deltaClass = computed(() => {
   if (!props.player.deltaDisplay) return ''
   return props.player.deltaDisplay > 0 ? 'delta--positive' : 'delta--negative'
-})
-
-onMounted(() => {
-  const mainCard: HTMLElement | null = document.querySelector(`#player-${props.player.id}`)
-
-  if (!mainCard) return
-
-  const height = mainCard.offsetHeight
-  const width = mainCard.offsetWidth
-
-  mainCard.style.transformOrigin = 'center';
-
-  if (props.rotation === 90 || props.rotation === -90) {
-    mainCard.style.height = `${width}px`
-    mainCard.style.width = `${height}px`
-    mainCard.style.transformOrigin = 'top left';
-  }
-
-  mainCard.style.transform = `rotate(${props.rotation}deg)`
-
-  // 3 players
-  if (props.rotation === -90) {
-    mainCard.style.transform = `rotate(${props.rotation}deg) translateX(-100%)`
-  }
-
-  // 5 players
-  if (props.rotation === 90) {
-    mainCard.style.transform = `rotate(${props.rotation}deg) translateY(-100%)`
-  }
 })
 </script>
 
@@ -276,7 +244,7 @@ onMounted(() => {
 
 .lc-life {
   font-family: 'Cinzel', serif;
-  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-size: clamp(2.5rem, min(26cqh, 20cqw), var(--hx-fs-life));
   font-weight: 700;
   line-height: 1;
   color: #fff;

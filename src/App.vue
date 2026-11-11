@@ -3,52 +3,26 @@
   <RouterView v-if="$route.path === '/_kit'" />
   <v-app v-else theme="dark" class="app-root">
     <v-main class="app-main">
-      <div v-if="gameStore.players.length > 0" :class="['game-grid', `grid-${gameStore.numPlayers}p`]">
-        <!-- ─── Player cards by seat ─── -->
-        <template v-for="slot in layoutSlots" :key="slot.area">
-          <div v-if="slot.type === 'player'" :style="{ gridArea: slot.area }">
-            <LifeCounter
-              :key="`player-${gameStore.players[slot.playerIndex!]!.id}-${gameTimestamp}`"
-              :player="gameStore.players[slot.playerIndex!]!"
-              :highlighted="highlightedPlayerId === gameStore.players[slot.playerIndex!]!.id && isAnimating"
-              :rotation="slot.rotation ?? 0"
-            />
-          </div>
+      <GameBoard v-if="gameStore.players.length > 0" :num-players="gameStore.numPlayers">
+        <template #seat="{ index }">
+          <LifeCounter
+            :player="gameStore.players[index]!"
+            :highlighted="highlightedPlayerId === gameStore.players[index]!.id && isAnimating"
+          />
         </template>
-        
-        <div style="grid-area: brand;">
-          <div class="brand-mark">
-            <span class="brand-title">HelM</span>
-            <span class="brand-tagline">Life Tracker</span>
-          </div>
-        </div>
-        <!-- ─── Center controls ─── -->
-        <div class="controls-cell" style="grid-area: controls">
+        <template #controls>
           <div class="controls-buttons">
-            <v-btn
-              icon
-              size="large"
-              variant="tonal"
-              color="primary"
-              @click="settingsDialogOpen = true"
-            >
+            <v-btn icon size="large" variant="tonal" color="primary" @click="settingsDialogOpen = true">
               <v-icon>mdi-cog</v-icon>
               <v-tooltip activator="parent" location="bottom">Game Settings</v-tooltip>
             </v-btn>
-
-            <v-btn
-              icon
-              size="large"
-              variant="tonal"
-              color="error"
-              @click="confirmReset"
-            >
+            <v-btn icon size="large" variant="tonal" color="error" @click="confirmReset">
               <v-icon>mdi-refresh</v-icon>
               <v-tooltip activator="parent" location="bottom">Reset Game</v-tooltip>
             </v-btn>
           </div>
-        </div>
-      </div>
+        </template>
+      </GameBoard>
 
       <!-- ─── First launch splash ─── -->
       <div v-else class="splash-screen">
@@ -108,10 +82,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useGameStore } from './stores/gameStore'
 import { useSettingsStore } from './stores/settingsStore'
 import { useStartingPlayer } from './composables/useStartingPlayer'
+import GameBoard from './components/GameBoard.vue'
 import LifeCounter from './components/LifeCounter.vue'
 import GameSettingsDialog from './components/GameSettingsDialog.vue'
 import StartingPlayerOverlay from './components/StartingPlayerOverlay.vue'
@@ -123,70 +98,11 @@ const { highlightedPlayerId, isAnimating, runAnimation } = useStartingPlayer()
 const settingsDialogOpen = ref(false)
 const showResetConfirm = ref(false)
 const showWinner = ref(false)
-const gameTimestamp = ref(Date.now())
-
-// ─── Layout slot definitions per player count ───────────────────────────────
-
-interface LayoutSlot {
-  area: string
-  type: 'player' | 'controls'
-  playerIndex?: number
-  rotation?: number
-}
-
-const layoutSlots = computed<LayoutSlot[]>(() => {
-  const n = gameStore.numPlayers
-  const maps: Record<number, LayoutSlot[]> = {
-    2: [
-      { area: 'p1', type: 'player', playerIndex: 0, rotation: 180 },
-      { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
-      { area: 'controls', type: 'controls' },
-    ],
-    3: [
-      { area: 'p1', type: 'player', playerIndex: 0, rotation: 180 },
-      { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
-      { area: 'p3', type: 'player', playerIndex: 2, rotation: -90 },
-      { area: 'controls', type: 'controls' },
-    ],
-    4: [
-      { area: 'p1', type: 'player', playerIndex: 0, rotation: 0 },
-      { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
-      { area: 'p3', type: 'player', playerIndex: 2, rotation: 180 },
-      { area: 'p4', type: 'player', playerIndex: 3, rotation: 180 },
-      { area: 'controls', type: 'controls' },
-    ],
-    5: [
-      { area: 'p1', type: 'player', playerIndex: 0, rotation: 0 },
-      { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
-      { area: 'p3', type: 'player', playerIndex: 2, rotation: 180 },
-      { area: 'p4', type: 'player', playerIndex: 3, rotation: 180 },
-      { area: 'p5', type: 'player', playerIndex: 4, rotation: -90 },
-      { area: 'controls', type: 'controls' },
-    ],
-    6: [
-      { area: 'p1', type: 'player', playerIndex: 0, rotation: 0 },
-      { area: 'p2', type: 'player', playerIndex: 1, rotation: 0 },
-      { area: 'p3', type: 'player', playerIndex: 2, rotation: 0 },
-      { area: 'p4', type: 'player', playerIndex: 3, rotation: 180 },
-      { area: 'p5', type: 'player', playerIndex: 4, rotation: 180 },
-      { area: 'p6', type: 'player', playerIndex: 5, rotation: 180 },
-      { area: 'controls', type: 'controls' },
-    ],
-  }
-  return maps[n] ?? maps[4]!
-})
 
 // ─── Winner watcher ─────────────────────────────────────────────────────────
 
 watch(() => gameStore.winner, val => {
   if (val) showWinner.value = true
-})
-
-// ─── Page size watcher ───────────────────────────────────────────────────────
-
-window.addEventListener("resize", () => {
-  // Trigger re-render of life counters to update their size
-  gameTimestamp.value = Date.now()
 })
 
 // ─── Reset helpers ───────────────────────────────────────────────────────────
@@ -209,7 +125,6 @@ async function onGameStart(numPlayers: number, life: number) {
     Array.from({ length: numPlayers }, (_, i) => i + 1)
   )
   gameStore.initGame(numPlayers, life)
-  gameTimestamp.value = Date.now()
   await runAnimation()
 }
 
@@ -259,109 +174,6 @@ html, body, #app {
   display: flex;
   align-items: stretch;
   justify-content: stretch;
-}
-
-/* ─── Grid layouts ─────────────────────────────────────────────── */
-
-.game-grid {
-  width: 100%;
-  height: 100dvh;
-  display: grid;
-  gap: 4px;
-  padding: 4px;
-  box-sizing: border-box;
-}
-
-/* 2 players */
-.grid-2p {
-  grid-template-rows: 1fr min-content 1fr;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas:
-    "p1 p1 p1"
-    "brand controls ."
-    "p2 p2 p2";
-}
-
-/* 3 players */
-.grid-3p {
-  grid-template-rows: 1fr min-content 1fr;
-  grid-template-columns: 1fr min-content 1fr;
-  grid-template-areas:
-    "p1        p1         p3"
-    "brand     controls   p3"
-    "p2        p2         p3";
-}
-
-/* 4 players */
-.grid-4p {
-  grid-template-rows: 1fr min-content 1fr;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  grid-template-areas:
-    "p3       p3 p4           p4"
-    "brand    controls controls   . "
-    "p1       p1 p2          p2";
-}
-
-/* 5 players */
-.grid-5p {
-  grid-template-rows: 1fr min-content 1fr;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas:
-    "p3       p4           p5"
-    "brand     controls    p5"
-    "p1       p2           p5";
-}
-
-/* 6 players */
-.grid-6p {
-  grid-template-rows: 1fr min-content 1fr;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-areas:
-    "p4     p5         p6"
-    "brand      controls   ."
-    "p1     p2         p3";
-}
-
-/* Grid cells: each player div fills its area */
-.game-grid > div {
-  min-height: 0;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-}
-
-/* Controls center */
-.controls-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-}
-
-.brand-mark {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  white-space: nowrap;
-}
-
-.brand-title {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
-  font-size: 1.9em;
-  font-weight: 700;
-  color: rgb(var(--v-theme-primary));
-  letter-spacing: 0.05em;
-  line-height: 1.1em;
-}
-
-.brand-tagline {
-  font-family: 'Cinzel', serif;
-  font-size: 0.76em;
-  color: rgba(255, 255, 255, 0.42);
-  line-height: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .controls-buttons {
