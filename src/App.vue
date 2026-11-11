@@ -1,5 +1,7 @@
 <template>
-  <v-app theme="dark" class="app-root">
+  <!-- TODO(step-2): throwaway kit route, remove before merge -->
+  <RouterView v-if="$route.path === '/_kit'" />
+  <v-app v-else theme="dark" class="app-root">
     <v-main class="app-main">
       <div v-if="gameStore.players.length > 0" :class="['game-grid', `grid-${gameStore.numPlayers}p`]">
         <!-- ─── Player cards by seat ─── -->
