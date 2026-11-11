@@ -10,8 +10,6 @@ const router = createRouter({
     { path: '/', component: HomeView },
     { path: '/new', component: NewGameView },
     { path: '/game', component: GameView },
-    // TODO(step-2): throwaway, remove before merge.
-    { path: '/_kit', component: () => import('./views/KitView.vue') },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
