@@ -44,7 +44,7 @@
       <CommanderDamageGrid :player="player" :all-players="gameStore.players" @open="cmdDialogOpen = true" />
     </footer>
 
-    <CommanderDamageDialog v-if="cmdDialogOpen" v-model="cmdDialogOpen" :player="player" :all-players="gameStore.players" />
+    <CommanderDamageDialog v-model:open="cmdDialogOpen" :player="player" :all-players="gameStore.players" />
   </div>
 </template>
 
