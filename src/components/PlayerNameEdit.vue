@@ -1,12 +1,13 @@
 <template>
-  <div class="name-edit-wrapper" @dblclick="startEdit">
-    <span v-if="!editing" class="player-name text-truncate">{{ modelValue }}</span>
+  <div class="name-edit">
+    <button v-if="!editing" class="name-edit__name" type="button" @click="startEdit">{{ modelValue }}</button>
     <input
       v-else
       ref="inputRef"
       v-model="draft"
-      class="name-input"
+      class="name-edit__input"
       :maxlength="20"
+      aria-label="Player name"
       @blur="commit"
       @keydown.enter="commit"
       @keydown.escape="cancel"
@@ -32,6 +33,7 @@ async function startEdit() {
 }
 
 function commit() {
+  if (!editing.value) return
   const trimmed = draft.value.trim()
   if (trimmed) emit('update:modelValue', trimmed)
   editing.value = false
@@ -43,33 +45,24 @@ function cancel() {
 </script>
 
 <style scoped>
-.name-edit-wrapper {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  min-width: 0;
+.name-edit { min-width: 0; }
+.name-edit__name,
+.name-edit__input {
+  max-width: 12rem;
+  padding: 0 var(--hx-s-1);
+  border: 0;
+  background: transparent;
+  color: var(--hx-ink);
+  font: inherit;
+  font-size: var(--hx-fs-body);
+  font-weight: 500;
 }
-
-.player-name {
-  font-weight: 600;
-  font-size: 0.95rem;
-  letter-spacing: 0.03em;
-  max-width: 140px;
+.name-edit__name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
 }
-
-.name-input {
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid currentColor;
-  color: inherit;
-  font: inherit;
-  font-weight: 600;
-  font-size: 0.95rem;
-  outline: none;
-  width: 140px;
-  padding: 0 2px;
-}
+.name-edit__name:focus-visible { outline: 2px solid var(--hx-gold); }
+.name-edit__input { border-bottom: 1px solid var(--hx-gold); outline: none; }
 </style>

@@ -1,6 +1,8 @@
 <template>
-  <div
+  <button
+    type="button"
     class="cmd-pip-grid"
+    aria-label="Commander damage"
     :style="{
       gridTemplateAreas: gridConfig.template[player.id] ?? gridConfig.template[1],
       gridTemplateColumns: gridConfig.cols,
@@ -35,7 +37,7 @@
         <span v-if="damage(slot.id) > 0" class="pip-num">{{ damage(slot.id) }}</span>
       </div>
     </div>
-  </div>
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -68,41 +70,36 @@ function playerName(id: number): string {
 <style scoped>
 .cmd-pip-grid {
   display: grid;
-  gap: 3px;
+  gap: var(--hx-s-1);
+  min-height: 3.5rem;
+  padding: var(--hx-s-1);
+  border: 0;
+  background: transparent;
   cursor: pointer;
-  min-height: 55px;
-  /* Size scales with content; each cell is 26px */
-  --cell: 26px;
 }
+.cmd-pip-grid:focus-visible { outline: 2px solid var(--hx-gold); }
 
-.pip-cell {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.pip-cell { display: flex; align-items: center; justify-content: center; }
 
+/* Diamond chip in the source player's color. */
 .pip-dot {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: box-shadow 0.2s;
+  width: 1.5rem;
+  height: 1.5rem;
+  transform: rotate(45deg);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
-
-.pip-dot--danger {
-  box-shadow: 0 0 5px 2px rgba(229, 57, 53, 0.85);
-}
+.pip-dot--danger { outline-color: var(--hx-danger); }
 
 .pip-num {
-  font-size: 0.6rem;
+  transform: rotate(-45deg);
+  font-family: var(--hx-font-sans);
+  font-size: 0.7rem;
   font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.9);
   line-height: 1;
+  color: var(--hx-ink-on-gold);
 }
-
 </style>

@@ -41,8 +41,8 @@
   --hx-p-void:   #4aa59b;
 
   /* ── Typography ───────────────────────────── */
-  --hx-font-serif: 'Cormorant Garamond', 'Cormorant', Georgia, serif;
-  --hx-font-sans:  'Inter', system-ui, sans-serif; /* tiny uppercase labels only */
+  --hx-font-serif: 'Cormorant Garamond Variable', 'Cormorant Garamond', 'Cormorant', Georgia, serif;
+  --hx-font-sans:  'Inter Variable', 'Inter', system-ui, sans-serif; /* tiny uppercase labels only */
 
   --hx-fs-label:   0.75rem;   /* 12px sans, uppercase, tracked */
   --hx-fs-body:    1.25rem;   /* 20px serif — serif reads small */

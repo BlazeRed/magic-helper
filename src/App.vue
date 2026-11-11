@@ -1,84 +1,50 @@
 <template>
   <!-- TODO(step-2): throwaway kit route, remove before merge -->
   <RouterView v-if="$route.path === '/_kit'" />
-  <v-app v-else theme="dark" class="app-root">
-    <v-main class="app-main">
-      <GameBoard v-if="gameStore.players.length > 0" :num-players="gameStore.numPlayers">
-        <template #seat="{ index }">
-          <LifeCounter
-            :player="gameStore.players[index]!"
-            :highlighted="highlightedPlayerId === gameStore.players[index]!.id && isAnimating"
-          />
-        </template>
-        <template #controls>
-          <div class="controls-buttons">
-            <v-btn icon size="large" variant="tonal" color="primary" @click="settingsDialogOpen = true">
-              <v-icon>mdi-cog</v-icon>
-              <v-tooltip activator="parent" location="bottom">Game Settings</v-tooltip>
-            </v-btn>
-            <v-btn icon size="large" variant="tonal" color="error" @click="confirmReset">
-              <v-icon>mdi-refresh</v-icon>
-              <v-tooltip activator="parent" location="bottom">Reset Game</v-tooltip>
-            </v-btn>
-          </div>
-        </template>
-      </GameBoard>
-
-      <!-- ─── First launch splash ─── -->
-      <div v-else class="splash-screen">
-        <div class="splash-content">
-          <h1 class="splash-brand mb-1">HelM</h1>
-          <p class="splash-tagline mb-6">Life Tracker</p>
-          <v-btn color="primary" size="large" @click="settingsDialogOpen = true">
-            <v-icon start>mdi-play</v-icon>
-            New Game
-          </v-btn>
-        </div>
-      </div>
-    </v-main>
-
-    <!-- ─── Winner snackbar ─── -->
-    <v-snackbar
-      v-model="showWinner"
-      :timeout="-1"
-      location="top"
-      color="success"
-      class="winner-snack"
-    >
-      <v-icon start>mdi-trophy</v-icon>
-      <strong>{{ gameStore.winner?.name }}</strong> wins!
-      <template #actions>
-        <v-btn variant="text" @click="showWinner = false">Dismiss</v-btn>
+  <div v-else class="app-root">
+    <GameBoard v-if="gameStore.players.length > 0" :num-players="gameStore.numPlayers">
+      <template #seat="{ index }">
+        <PlayerCard
+          :player="gameStore.players[index]!"
+          :highlighted="highlightedPlayerId === gameStore.players[index]!.id && isAnimating"
+        />
       </template>
-    </v-snackbar>
+      <template #controls>
+        <div class="controls-buttons">
+          <HxButton variant="icon" aria-label="Game settings" @click="settingsDialogOpen = true">
+            <HxIcon name="settings" />
+          </HxButton>
+          <HxButton variant="icon" aria-label="Reset game" @click="showResetConfirm = true">
+            <HxIcon name="reset" />
+          </HxButton>
+        </div>
+      </template>
+    </GameBoard>
 
-    <!-- ─── Reset confirm dialog ─── -->
-    <v-dialog v-model="showResetConfirm" max-width="340">
-      <v-card rounded="xl" color="#1e1e1e">
-        <v-card-title class="pa-4 pb-2">
-          <v-icon color="error" class="mr-2">mdi-refresh</v-icon>
-          Reset Game?
-        </v-card-title>
-        <v-card-text class="pa-4 pt-0 text-medium-emphasis">
-          All life totals and commander damage will be reset to the starting values.
-        </v-card-text>
-        <v-card-actions class="pa-4 pt-0 gap-2">
-          <v-btn variant="text" @click="showResetConfirm = false">Cancel</v-btn>
-          <v-spacer />
-          <v-btn color="error" variant="elevated" @click="doReset">
-            <v-icon start>mdi-refresh</v-icon>
-            Reset
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <!-- First launch splash (replaced by Home in Step 6) -->
+    <div v-else class="splash">
+      <h1 class="splash__title">HelM</h1>
+      <p class="hx-label">Life Tracker</p>
+      <HxButton variant="primary" @click="settingsDialogOpen = true">New game</HxButton>
+    </div>
 
-    <!-- ─── Starting player overlay ─── -->
-    <StartingPlayerOverlay :visible="isAnimating" />
+    <!-- Winner (replaced by VictoryView in Step 6) -->
+    <HxDialog v-model:open="showWinner" title="Victory">
+      <p class="winner__text">{{ gameStore.winner?.name }} wins!</p>
+      <HxButton variant="primary" @click="showWinner = false">Close</HxButton>
+    </HxDialog>
 
-    <!-- ─── Dialogs ─── -->
+    <HxConfirm
+      v-model:open="showResetConfirm"
+      title="Reset game?"
+      text="All life totals and commander damage return to the starting values."
+      confirm-label="Reset"
+      @confirm="doReset"
+    />
+
+    <StartingPlayerOverlay :visible="isAnimating" :highlighted-player-id="highlightedPlayerId" />
     <GameSettingsDialog v-model="settingsDialogOpen" @start="onGameStart" />
-  </v-app>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -87,9 +53,13 @@ import { useGameStore } from './stores/gameStore'
 import { useSettingsStore } from './stores/settingsStore'
 import { useStartingPlayer } from './composables/useStartingPlayer'
 import GameBoard from './components/GameBoard.vue'
-import LifeCounter from './components/LifeCounter.vue'
+import PlayerCard from './components/PlayerCard.vue'
 import GameSettingsDialog from './components/GameSettingsDialog.vue'
 import StartingPlayerOverlay from './components/StartingPlayerOverlay.vue'
+import HxButton from './components/ui/HxButton.vue'
+import HxConfirm from './components/ui/HxConfirm.vue'
+import HxDialog from './components/ui/HxDialog.vue'
+import HxIcon from './components/ui/HxIcon.vue'
 
 const gameStore = useGameStore()
 const settingsStore = useSettingsStore()
@@ -106,10 +76,6 @@ watch(() => gameStore.winner, val => {
 })
 
 // ─── Reset helpers ───────────────────────────────────────────────────────────
-
-function confirmReset() {
-  showResetConfirm.value = true
-}
 
 function doReset() {
   showResetConfirm.value = false
@@ -145,72 +111,27 @@ onMounted(async () => {
 })
 </script>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700;900&display=swap');
-
-html, body, #app {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  touch-action: manipulation;
-  font-family: 'Cinzel', serif;
-}
-
-.app-root, .app-main {
-  width: 100% !important;
-  height: 100% !important;
-  max-height: 100dvh !important;
-}
-
-.v-main__wrap {
-  height: 100% !important;
-}
-</style>
-
 <style scoped>
-.app-main {
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-}
+.app-root { width: 100%; height: 100dvh; overflow: hidden; }
 
-.controls-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1em;
-}
+.controls-buttons { display: flex; gap: var(--hx-s-4); }
 
-
-/* Splash screen */
-.splash-screen {
-  width: 100%;
-  height: 100dvh;
+.splash {
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--hx-s-4);
 }
-
-.splash-content {
-  text-align: center;
-  padding: 32px;
-}
-
-.splash-brand {
-  font-family: 'Cinzel Decorative', 'Cinzel', serif;
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  font-weight: 700;
-  color: rgb(var(--v-theme-primary));
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-}
-
-.splash-tagline {
-  font-family: 'Cinzel', serif;
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.18em;
+.splash__title {
+  margin: 0;
+  font-size: var(--hx-fs-display);
+  font-weight: 500;
+  letter-spacing: var(--hx-tracking-title);
   text-transform: uppercase;
+  color: var(--hx-ink-strong);
 }
+
+.winner__text { margin: 0 0 var(--hx-s-5); font-size: var(--hx-fs-lead); }
 </style>
