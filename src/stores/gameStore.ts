@@ -132,6 +132,12 @@ export const useGameStore = defineStore('game', () => {
     saveState()
   }
 
+  // New game with random start turned off: play without choosing a starting player.
+  function skipStartingPlayer() {
+    gamePhase.value = 'playing'
+    saveState()
+  }
+
   function setStartingPlayer(id: number) {
     players.value.forEach(p => {
       p.isStartingPlayer = p.id === id
@@ -204,6 +210,7 @@ export const useGameStore = defineStore('game', () => {
     initGame,
     resetGame,
     startSelectingPlayer,
+    skipStartingPlayer,
     setStartingPlayer,
     adjustLife,
     adjustCommanderDamage,
