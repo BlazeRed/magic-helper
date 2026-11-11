@@ -1,1 +1,1 @@
-declare module 'vuetify/styles'
+/// <reference types="vite/client" />

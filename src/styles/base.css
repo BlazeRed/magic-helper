@@ -1,0 +1,44 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #app { height: 100%; margin: 0; }
+
+body {
+  background: var(--hx-bg);
+  color: var(--hx-ink);
+  font-family: var(--hx-font-serif);
+  font-size: var(--hx-fs-body);
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button { font: inherit; color: inherit; }
+
+/* Double frame: outer border + inner inset border. */
+.hx-frame {
+  position: relative;
+  border: var(--hx-border);
+  border-radius: var(--hx-radius-lg);
+}
+.hx-frame::after {
+  content: '';
+  position: absolute;
+  inset: var(--hx-frame-inset);
+  border: 1px solid var(--hx-line-soft);
+  border-radius: var(--hx-radius);
+  pointer-events: none;
+}
+
+.hx-label {
+  font-family: var(--hx-font-sans);
+  font-size: var(--hx-fs-label);
+  text-transform: uppercase;
+  letter-spacing: var(--hx-tracking-label);
+  color: var(--hx-ink-faint);
+}
+
+.hx-rule {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--hx-line-strong), transparent);
+}

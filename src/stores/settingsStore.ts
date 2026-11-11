@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
-import { DEFAULT_ACCENT } from '../plugins/vuetify'
 
 export const MTG_COLORS = [
   { name: 'Mountain (Red)',    hex: '#e53935' },
@@ -12,15 +11,17 @@ export const MTG_COLORS = [
   { name: 'Eldrazi (Void)',    hex: '#00695c' },
 ]
 
+// Default color per seat: red, blue, green, black, white, silver.
+const SEAT_DEFAULTS = ['#e53935', '#1e88e5', '#388e3c', '#8e24aa', '#f9a825', '#90a4ae']
+const seatDefault = (playerId: number) => SEAT_DEFAULTS[(playerId - 1 + SEAT_DEFAULTS.length) % SEAT_DEFAULTS.length]
+
 const STORAGE_KEY = 'mtg-app-settings'
 
 interface AppSettings {
-  accentColor: string
   playerColors: Record<number, string>
 }
 
 export const useSettingsStore = defineStore('settings', () => {
-  const accentColor = ref<string>(DEFAULT_ACCENT)
   const playerColors = ref<Record<number, string>>({})
 
   function loadSettings() {
@@ -28,7 +29,6 @@ export const useSettingsStore = defineStore('settings', () => {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (raw) {
         const parsed = JSON.parse(raw) as AppSettings
-        accentColor.value = parsed.accentColor ?? DEFAULT_ACCENT
         playerColors.value = parsed.playerColors ?? {}
       }
     } catch {
@@ -38,15 +38,9 @@ export const useSettingsStore = defineStore('settings', () => {
 
   function saveSettings() {
     const data: AppSettings = {
-      accentColor: accentColor.value,
       playerColors: playerColors.value,
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-  }
-
-  function setAccentColor(hex: string) {
-    accentColor.value = hex
-    saveSettings()
   }
 
   function setPlayerColor(playerId: number, hex: string) {
@@ -55,7 +49,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   function getPlayerColor(playerId: number): string {
-    return playerColors.value[playerId] ?? '#1e88e5'
+    return playerColors.value[playerId] ?? seatDefault(playerId)
   }
 
   function ensurePlayerColors(playerIds: number[]) {
@@ -63,7 +57,7 @@ export const useSettingsStore = defineStore('settings', () => {
     let changed = false
     for (const id of playerIds) {
       if (!updated[id]) {
-        updated[id] = '#1e88e5'
+        updated[id] = seatDefault(id)
         changed = true
       }
     }
@@ -73,13 +67,11 @@ export const useSettingsStore = defineStore('settings', () => {
     }
   }
 
-  watch([accentColor, playerColors], saveSettings, { deep: true })
+  watch(playerColors, saveSettings, { deep: true })
 
   return {
-    accentColor,
     playerColors,
     loadSettings,
-    setAccentColor,
     setPlayerColor,
     getPlayerColor,
     ensurePlayerColors,

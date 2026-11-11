@@ -107,7 +107,6 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, computed } from 'vue'
-import { useTheme } from 'vuetify'
 import { useGameStore } from './stores/gameStore'
 import { useSettingsStore } from './stores/settingsStore'
 import { useStartingPlayer } from './composables/useStartingPlayer'
@@ -115,15 +114,9 @@ import LifeCounter from './components/LifeCounter.vue'
 import GameSettingsDialog from './components/GameSettingsDialog.vue'
 import StartingPlayerOverlay from './components/StartingPlayerOverlay.vue'
 
-const theme = useTheme()
 const gameStore = useGameStore()
 const settingsStore = useSettingsStore()
 const { highlightedPlayerId, isAnimating, runAnimation } = useStartingPlayer()
-
-// Sync accent color → Vuetify theme
-watch(() => settingsStore.accentColor, color => {
-  theme.themes.value.dark!.colors.primary = color
-}, { immediate: true })
 
 const settingsDialogOpen = ref(false)
 const showResetConfirm = ref(false)
